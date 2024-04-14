@@ -4,23 +4,23 @@ organization := "org.alitouka"
 
 version := "0.0.4"
 
-scalaVersion := "2.10.6"
+scalaVersion := "2.11.12"
 
 resolvers ++= Seq(
-  "apache-snapshots" at "http://repository.apache.org/snapshots/"
+  "apache-snapshots" at "https://repository.apache.org/snapshots/"
 )
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "2.2.1" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-core" % "2.4.8" % "provided"
 
-libraryDependencies += "org.scalatest" % "scalatest_2.10" % "3.0.4" % Test
+libraryDependencies += "org.scalatest" % "scalatest_2.11" % "3.2.18" % Test
 
-libraryDependencies += "org.apache.commons" % "commons-math3" % "3.2"
+libraryDependencies += "org.apache.commons" % "commons-math3" % "3.6.1"
 
-libraryDependencies += "com.github.scopt" %% "scopt" % "3.7.0"
+libraryDependencies += "com.github.scopt" %% "scopt" % "4.1.0"
 
-assemblyMergeStrategy in assembly := {
+assembly / assemblyMergeStrategy := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
   case x => MergeStrategy.first
 }
 
-test in assembly := {}
+assembly / test := {}
