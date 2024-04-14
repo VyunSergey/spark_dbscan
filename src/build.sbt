@@ -10,13 +10,13 @@ resolvers ++= Seq(
   "apache-snapshots" at "https://repository.apache.org/snapshots/"
 )
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "2.4.8" % "provided"
-
-libraryDependencies += "org.scalatest" % "scalatest_2.11" % "3.2.18" % Test
-
-libraryDependencies += "org.apache.commons" % "commons-math3" % "3.6.1"
-
-libraryDependencies += "com.github.scopt" %% "scopt" % "4.1.0"
+libraryDependencies ++= Seq(
+  "com.github.scopt" %% "scopt" % "4.1.0",
+  "org.apache.commons" % "commons-math3" % "3.6.1",
+  "org.apache.spark" %% "spark-core" % "2.4.8" % "provided",
+  "org.scalactic" %% "scalactic" % "3.2.18",
+  "org.scalatest" %% "scalatest" % "3.2.18" % Test
+)
 
 assembly / assemblyMergeStrategy := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
