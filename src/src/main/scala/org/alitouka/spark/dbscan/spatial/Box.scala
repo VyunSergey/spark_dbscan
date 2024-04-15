@@ -9,7 +9,7 @@ import org.alitouka.spark.dbscan.util.math.DoubleComparisonOperations._
   * @param boxId A unique identifier of this box
   * @param partitionId Identifier of a data set partition which corresponds to this box
   */
-private [dbscan] class Box (val bounds: Array[BoundsInOneDimension], val boxId: BoxId = 0, val partitionId: Int = -1, var adjacentBoxes: List[Box] = Nil)
+private [dbscan] class Box(val bounds: Array[BoundsInOneDimension], val boxId: BoxId = 0, val partitionId: Int = -1, var adjacentBoxes: List[Box] = Nil)
   extends Serializable with Ordered[Box] {
 
   val centerPoint = calculateCenter (bounds)
@@ -25,44 +25,44 @@ private [dbscan] class Box (val bounds: Array[BoundsInOneDimension], val boxId: 
 
     val (longestDimension, idx) = findLongestDimensionAndItsIndex()
 
-    val beforeLongest = if (idx > 0) bounds.take (idx) else Array[BoundsInOneDimension] ()
-    val afterLongest = if (idx < bounds.size-1) bounds.drop(idx+1) else Array[BoundsInOneDimension] ()
+    val beforeLongest = if (idx > 0) bounds.take (idx) else Array[BoundsInOneDimension]()
+    val afterLongest = if (idx < bounds.size-1) bounds.drop(idx+1) else Array[BoundsInOneDimension]()
     val splits = longestDimension.split(numberOfSplits)
 
     splits.map {
       s => {
         val newBounds = (beforeLongest :+ s) ++: afterLongest
-        new Box (newBounds, idGenerator.getNextId())
+        new Box(newBounds, idGenerator.getNextId())
       }
     }
   }
 
   def isPointWithin (pt: Point) = {
 
-    assert (bounds.length == pt.coordinates.length)
+    assert(bounds.length == pt.coordinates.length)
 
-    bounds.zip (pt.coordinates).forall( x => x._1.isNumberWithin(x._2) )
+    bounds.zip(pt.coordinates).forall( x => x._1.isNumberWithin(x._2))
   }
 
   def isBigEnough (settings: DbscanSettings): Boolean = {
 
-    bounds.forall( _.length >= 2*settings.epsilon )
+    bounds.forall(_.length >= 2*settings.epsilon )
   }
 
-  def extendBySizeOfOtherBox (b: Box): Box = {
+  def extendBySizeOfOtherBox(b: Box): Box = {
 
-    assert (this.bounds.size == b.bounds.size)
+    assert(this.bounds.size == b.bounds.size)
 
-    val newBounds = this.bounds.zip (b.bounds).map ( x => x._1.extend(x._2) )
-    new Box (newBounds)
+    val newBounds = this.bounds.zip(b.bounds).map(x => x._1.extend(x._2))
+    new Box(newBounds)
   }
 
   def withId (newId: BoxId): Box = {
-    new Box (this.bounds, newId, this.partitionId, this.adjacentBoxes)
+    new Box(this.bounds, newId, this.partitionId, this.adjacentBoxes)
   }
 
   def withPartitionId (newPartitionId: Int): Box = {
-    new Box (this.bounds, this.boxId, newPartitionId, this.adjacentBoxes)
+    new Box(this.bounds, this.boxId, newPartitionId, this.adjacentBoxes)
   }
 
   override def toString (): String = {
@@ -92,23 +92,23 @@ private [dbscan] class Box (val bounds: Array[BoundsInOneDimension], val boxId: 
   }
 
   private [dbscan] def calculateCenter (b: Array[BoundsInOneDimension]): Point = {
-    val centerCoordinates = b.map ( x => x.lower + (x.upper - x.lower) / 2 )
-    new Point (centerCoordinates)
+    val centerCoordinates = b.map(x => x.lower + (x.upper - x.lower) / 2 )
+    new Point(centerCoordinates)
   }
 
-  def addAdjacentBox (b: Box) = {
+  def addAdjacentBox(b: Box) = {
     adjacentBoxes = b :: adjacentBoxes
   }
 
   override def compare(that: Box): Int = {
-    assert (this.bounds.size == that.bounds.size)
+    assert(this.bounds.size == that.bounds.size)
 
     centerPoint.compareTo(that.centerPoint)
   }
 
-  def isAdjacentToBox (that: Box): Boolean = {
+  def isAdjacentToBox(that: Box): Boolean = {
 
-    assert (this.bounds.size == that.bounds.size)
+    assert(this.bounds.size == that.bounds.size)
 
     val (adjacentBounds, notAdjacentBounds) = this.bounds.zip(that.bounds).partition {
       x => {
@@ -130,7 +130,7 @@ private [dbscan] class Box (val bounds: Array[BoundsInOneDimension], val boxId: 
 object Box {
   def apply (centerPoint: Point, size: Box): Box = {
 
-    val newBounds = centerPoint.coordinates.map ( c => new BoundsInOneDimension(c, c, true) ).toArray
-    new Box (newBounds).extendBySizeOfOtherBox(size)
+    val newBounds = centerPoint.coordinates.map(c => new BoundsInOneDimension(c, c, true)).toArray
+    new Box(newBounds).extendBySizeOfOtherBox(size)
   }
 }

@@ -20,9 +20,9 @@ object IOHelper {
   def readDataset (sc: SparkContext, path: String): RawDataSet = {
     val rawData = sc.textFile (path)
 
-    rawData.map (
+    rawData.map(
       line => {
-        new Point (line.split(separator).map( _.toDouble ))
+        new Point(line.split(separator).map(_.toDouble ))
       }
     )
   }
@@ -37,14 +37,14 @@ object IOHelper {
     */
   def saveClusteringResult (model: DbscanModel, outputPath: String) {
 
-    model.allPoints.map ( pt => {
+    model.allPoints.map(pt => {
 
       pt.coordinates.mkString(separator) + separator + pt.clusterId
     } ).saveAsTextFile(outputPath)
   }
 
   private [dbscan] def saveTriples (data: RDD[(Double, Double, Long)], outputPath: String) {
-    data.map ( x => x._1 + separator + x._2 + separator + x._3 ).saveAsTextFile(outputPath)
+    data.map(x => x._1 + separator + x._2 + separator + x._3 ).saveAsTextFile(outputPath)
   }
 
   private def separator = ","

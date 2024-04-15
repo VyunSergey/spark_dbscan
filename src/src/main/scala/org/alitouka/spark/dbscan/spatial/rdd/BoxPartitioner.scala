@@ -10,7 +10,7 @@ import org.alitouka.spark.dbscan.BoxId
   */
 private [dbscan] class BoxPartitioner (val boxes: Iterable[Box]) extends Partitioner {
 
-  assert (boxes.forall(_.partitionId >= 0))
+  assert(boxes.forall(_.partitionId >= 0))
 
   private val boxIdsToPartitions = generateBoxIdsToPartitionsMap(boxes)
 
@@ -28,14 +28,14 @@ private [dbscan] class BoxPartitioner (val boxes: Iterable[Box]) extends Partiti
 
 
   private def generateBoxIdsToPartitionsMap (boxes: Iterable[Box]): Map[BoxId, Int] = {
-    boxes.map ( x => (x.boxId, x.partitionId)).toMap
+    boxes.map(x => (x.boxId, x.partitionId)).toMap
   }
 }
 
 private [dbscan] object BoxPartitioner {
 
   def assignPartitionIdsToBoxes (boxes: Iterable[Box]): Iterable[Box] = {
-    boxes.zip (0 until boxes.size).map ( x => x._1.withPartitionId(x._2) )
+    boxes.zip(0 until boxes.size).map(x => x._1.withPartitionId(x._2))
   }
 
 }

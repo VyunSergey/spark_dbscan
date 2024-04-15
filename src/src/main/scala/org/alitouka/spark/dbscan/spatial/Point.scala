@@ -11,7 +11,7 @@ import org.alitouka.spark.dbscan._
   * @param precomputedNumberOfNeighbors Number of point's neighbors
   * @param clusterId ID of a cluster which this points belongs to
   */
-class Point (
+class Point(
     val coordinates: PointCoordinates,
     val pointId: PointId = 0,
     val boxId: BoxId = 0,
@@ -19,35 +19,35 @@ class Point (
     val precomputedNumberOfNeighbors: Long = 0,
     val clusterId: ClusterId = DbscanModel.UndefinedCluster) extends Serializable with Ordered[Point] {
 
-  def this (coords: Array[Double]) = this (new PointCoordinates (coords))
+  def this (coords: Array[Double]) = this (new PointCoordinates(coords))
 
   def this (pt: Point) = this (pt.coordinates, pt.pointId, pt.boxId, pt.distanceFromOrigin,
       pt.precomputedNumberOfNeighbors,  pt.clusterId)
 
-  def this (coords: Double*) = this (new PointCoordinates (coords.toArray))
+  def this (coords: Double*) = this (new PointCoordinates(coords.toArray))
 
-  def withPointId (newId: PointId) = {
-    new Point (this.coordinates, newId, this.boxId, this.distanceFromOrigin,
+  def withPointId(newId: PointId) = {
+    new Point(this.coordinates, newId, this.boxId, this.distanceFromOrigin,
         this.precomputedNumberOfNeighbors,  this.clusterId)
   }
 
   def withBoxId (newBoxId: BoxId) = {
-    new Point (this.coordinates, this.pointId, newBoxId, this.distanceFromOrigin,
+    new Point(this.coordinates, this.pointId, newBoxId, this.distanceFromOrigin,
         this.precomputedNumberOfNeighbors,  this.clusterId)
   }
 
   def withDistanceFromOrigin (newDistance: Double) = {
-    new Point (this.coordinates, this.pointId, this.boxId, newDistance,
+    new Point(this.coordinates, this.pointId, this.boxId, newDistance,
         this.precomputedNumberOfNeighbors,  this.clusterId)
   }
 
   def withNumberOfNeighbors (newNumber: Long) = {
-    new Point (this.coordinates, this.pointId, this.boxId, this.distanceFromOrigin, newNumber,
+    new Point(this.coordinates, this.pointId, this.boxId, this.distanceFromOrigin, newNumber,
        this.clusterId)
   }
 
   def withClusterId (newId: ClusterId) = {
-    new Point (this.coordinates, this.pointId, this.boxId, this.distanceFromOrigin, this.precomputedNumberOfNeighbors,
+    new Point(this.coordinates, this.pointId, this.boxId, this.distanceFromOrigin, this.precomputedNumberOfNeighbors,
       newId)
   }
 

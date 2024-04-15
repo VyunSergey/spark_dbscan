@@ -1,7 +1,6 @@
 package org.alitouka.spark.dbscan.exploratoryAnalysis
 
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
 import org.alitouka.spark.dbscan.util.io.IOHelper
 import org.alitouka.spark.dbscan.DbscanSettings
 import ExploratoryAnalysisHelper._
@@ -20,17 +19,16 @@ object NumberOfPointsWithinDistanceDriver {
   private [dbscan] class Args extends CommonArgs with NumberOfBucketsArg with EpsArg with NumberOfPointsInPartitionArg
 
   private [dbscan] class ArgsParser
-    extends CommonArgsParser (new Args (), "NumberOfPointsWithinDistanceDriver")
+    extends CommonArgsParser(new Args(), "NumberOfPointsWithinDistanceDriver")
     with NumberOfBucketsArgParsing [Args]
     with EpsArgParsing[Args]
     with NumberOfPointsInPartitionParsing[Args]
 
+  def main (args: Array[String]): Unit = {
+    val argsParser = new ArgsParser()
 
-  def main (args: Array[String]) {
-    val argsParser = new ArgsParser ()
-
-    if (argsParser.parse(args)) {
-      val clock = new Clock ()
+    if (argsParser.parse(args, new Args()).nonEmpty) {
+      val clock = new Clock()
       val distance = argsParser.args.eps
 
       val sc = new SparkContext(argsParser.args.masterUrl,
@@ -43,7 +41,7 @@ object NumberOfPointsWithinDistanceDriver {
         .withEpsilon(distance)
         .withDistanceMeasure(argsParser.args.distanceMeasure)
 
-      val partitioningSettings = new PartitioningSettings (numberOfPointsInBox = argsParser.args.numberOfPoints)
+      val partitioningSettings = new PartitioningSettings(numberOfPointsInBox = argsParser.args.numberOfPoints)
       
       val histogram = createNumberOfPointsWithinDistanceHistogram(data, settings, partitioningSettings, argsParser.args.numberOfBuckets)
 
@@ -64,12 +62,10 @@ object NumberOfPointsWithinDistanceDriver {
     data: RawDataSet,
     settings: DbscanSettings,
     partitioningSettings: PartitioningSettings = new PartitioningSettings(),
-    numberOfBuckets: Int = -1) = {
-    
-    val partitionedData = PointsPartitionedByBoxesRDD (data, partitioningSettings, settings)
+    numberOfBuckets: Int = -1): (Array[Double], Array[Long]) = {
+    val partitionedData = PointsPartitionedByBoxesRDD(data, partitioningSettings, settings)
     val distanceAnalyzer = new DistanceAnalyzer(settings)
     val closePoints = distanceAnalyzer.countClosePoints(partitionedData)
-
     val countsOfPointsWithNeighbors = closePoints
       .map(x => (x._1.pointId, x._2))
       .foldByKey (1L)(_+_)
@@ -81,16 +77,19 @@ object NumberOfPointsWithinDistanceDriver {
       .keys
       .subtract(countsOfPointsWithNeighbors.keys)
       .map((_, 0L))
-    
+
     val allCounts = countsOfPointsWithNeighbors union countsOfPointsWithoutNeighbors
-    
+
     allCounts.persist()
-    
-    val histogram = if(numberOfBuckets < 1) ExploratoryAnalysisHelper.calculateHistogram(allCounts) else ExploratoryAnalysisHelper.calculateHistogram(allCounts, numberOfBuckets)
-    
+
+    val histogram = if (numberOfBuckets < 1) {
+      ExploratoryAnalysisHelper.calculateHistogram(allCounts)
+    } else {
+      ExploratoryAnalysisHelper.calculateHistogram(allCounts, numberOfBuckets)
+    }
+
     allCounts.unpersist()
-    
+
     histogram
   }
-
 }

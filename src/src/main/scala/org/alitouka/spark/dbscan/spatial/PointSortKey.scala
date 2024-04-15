@@ -1,6 +1,6 @@
 package org.alitouka.spark.dbscan.spatial
 
-private [dbscan] class PointSortKey (pt: Point) extends  Ordered[PointSortKey] with Serializable {
+private [dbscan] class PointSortKey(pt: Point) extends  Ordered[PointSortKey] with Serializable {
   val boxId = pt.boxId
   val pointId = pt.pointId
 

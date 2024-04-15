@@ -11,16 +11,14 @@ import org.apache.spark.SparkContext._
   * @param data A raw data set
   */
 private [dbscan] class BoxCalculator (val data: RawDataSet) {
+  val numberOfDimensions: Int = getNumberOfDimensions(data)
 
-  val numberOfDimensions: Int = getNumberOfDimensions (data)
-
-  def generateDensityBasedBoxes (partitioningSettings: PartitioningSettings = new PartitioningSettings (),
-                                 dbscanSettings: DbscanSettings = new DbscanSettings ()): (Iterable[Box], Box) = {
+  def generateDensityBasedBoxes (partitioningSettings: PartitioningSettings = new PartitioningSettings(),
+                                 dbscanSettings: DbscanSettings = new DbscanSettings()): (Iterable[Box], Box) = {
 
     val datasetBounds = calculateBounds(data, numberOfDimensions)
-    val rootBox = new Box (datasetBounds.toArray)
+    val rootBox = new Box(datasetBounds.toArray)
     val boxTree = BoxCalculator.generateTreeOfBoxes(rootBox, partitioningSettings, dbscanSettings)
-
     val broadcastBoxTree = data.sparkContext.broadcast(boxTree)
 
     val partialCounts: RDD[(BoxId, Long)] = data.mapPartitions {
@@ -40,30 +38,27 @@ private [dbscan] class BoxCalculator (val data: RawDataSet) {
     (BoxPartitioner.assignPartitionIdsToBoxes(boxesWithEnoughPoints), rootBox)
   }
 
-
-
-
-  private [dbscan] def getNumberOfDimensions (ds: RawDataSet): Int = {
+  private [dbscan] def getNumberOfDimensions(ds: RawDataSet): Int = {
     val pt = ds.first()
     pt.coordinates.length
   }
 
-  def calculateBoundingBox: Box = new Box (calculateBounds (data, numberOfDimensions).toArray)
+  def calculateBoundingBox: Box = new Box(calculateBounds (data, numberOfDimensions).toArray)
 
   private [dbscan] def calculateBounds (ds: RawDataSet, dimensions: Int): List[BoundsInOneDimension] = {
-    val minPoint = new Point (Array.fill (dimensions)(Double.MaxValue))
-    val maxPoint = new Point (Array.fill (dimensions)(Double.MinValue))
+    val minPoint = new Point(Array.fill (dimensions)(Double.MaxValue))
+    val maxPoint = new Point(Array.fill (dimensions)(Double.MinValue))
 
     val mins = fold (ds, minPoint, x => Math.min (x._1, x._2))
     val maxs = fold (ds, maxPoint, x => Math.max (x._1, x._2))
 
-    mins.coordinates.zip (maxs.coordinates).map ( x => new BoundsInOneDimension (x._1, x._2, true) ).toList
+    mins.coordinates.zip(maxs.coordinates).map(x => new BoundsInOneDimension(x._1, x._2, true)).toList
   }
 
   private def fold (ds: RawDataSet, zeroValue: Point, mapFunction: ((Double, Double)) => Double) = {
     ds.fold(zeroValue) {
       (pt1, pt2) => {
-        new Point (pt1.coordinates.zip (pt2.coordinates).map ( mapFunction ).toArray)
+        new Point(pt1.coordinates.zip(pt2.coordinates).map(mapFunction ).toArray)
       }
     }
   }
@@ -99,13 +94,13 @@ private [dbscan] object BoxCalculator {
         .toList
     }
     else {
-      List[BoxTreeItemWithNumberOfPoints] ()
+      List[BoxTreeItemWithNumberOfPoints]()
     }
 
     result
   }
 
-  def countOnePoint (pt: Point, root: BoxTreeItemWithNumberOfPoints): Unit = {
+  def countOnePoint(pt: Point, root: BoxTreeItemWithNumberOfPoints): Unit = {
 
     if (root.box.isPointWithin(pt)) {
       root.numberOfPoints += 1
@@ -117,7 +112,7 @@ private [dbscan] object BoxCalculator {
   }
 
   def countPointsInOnePartition (root: BoxTreeItemWithNumberOfPoints, it: Iterator[Point]): Iterator[(BoxId, Long)] = {
-    it.foreach (pt => BoxCalculator.countOnePoint (pt, root))
+    it.foreach(pt => BoxCalculator.countOnePoint(pt, root))
     root.flatten.map {
       x: BoxTreeItemWithNumberOfPoints => { (x.box.boxId, x.numberOfPoints) }
     }.iterator
@@ -141,10 +136,10 @@ private [dbscan] object BoxCalculator {
   def splitBoxIntoEqualBoxes (rootBox: Box, maxSplits: Int, dbscanSettings: DbscanSettings): Iterable[Box] = {
 
     val dimensions = rootBox.bounds.size
-    val splits = rootBox.bounds.map ( _.split(maxSplits, dbscanSettings) )
+    val splits = rootBox.bounds.map(_.split(maxSplits, dbscanSettings))
     val combinations = BoxCalculator.generateCombinationsOfSplits(splits.toList, dimensions-1)
 
-    for (i <- 0 until combinations.size) yield new Box (combinations(i).reverse , i+1)
+    for (i <- 0 until combinations.size) yield new Box(combinations(i).reverse , i+1)
   }
 
   private [dbscan] def assignAdjacentBoxes (boxesWithEnoughPoints: Iterable[Box]) = {
@@ -172,7 +167,7 @@ private [dbscan] object BoxCalculator {
     rootBoxId <= adjacentBoxId
   }
 
-  private [dbscan] def generateEmbracingBox (boxes: Iterable[Box]): Box = {
+  private [dbscan] def generateEmbracingBox(boxes: Iterable[Box]): Box = {
 
     val it = boxes.iterator
     val firstBox = it.next
@@ -181,9 +176,9 @@ private [dbscan] object BoxCalculator {
 
     it.foreach {
       b => {
-        assert (embracingBoxBounds.size == b.bounds.size)
+        assert(embracingBoxBounds.size == b.bounds.size)
 
-        embracingBoxBounds = embracingBoxBounds.zip (b.bounds).map {
+        embracingBoxBounds = embracingBoxBounds.zip(b.bounds).map {
           x => x._1.increaseToFit(x._2)
         }
       }

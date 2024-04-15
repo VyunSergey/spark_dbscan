@@ -1,7 +1,6 @@
 package org.alitouka.spark.dbscan.exploratoryAnalysis
 
 import org.apache.spark.rdd.RDD
-import  org.apache.spark.SparkContext._
 import scala.collection.mutable.ArrayBuffer
 import org.alitouka.spark.dbscan.DbscanSettings
 import org.alitouka.spark.dbscan.spatial.DistanceAnalyzer
@@ -22,7 +21,6 @@ object ExploratoryAnalysisHelper {
     rddWithLongIndexesAndLongValues.map(x => (x._1, x._2.toDouble))
   }
 
-
   /** Calculates number of point's neighbors within a specified distance and builds a histogram
     * which represents distribution of this number across the dataset
     *
@@ -39,7 +37,7 @@ object ExploratoryAnalysisHelper {
       numberOfBuckets: Int = DefaultNumberOfBucketsInHistogram,
       distanceMeasure: DistanceMeasure = DbscanSettings.getDefaultDistanceMeasure): Unit = {
 
-    val clock = new Clock ()
+    val clock = new Clock()
 
     val settings = new DbscanSettings()
       .withEpsilon(eps)
@@ -51,7 +49,7 @@ object ExploratoryAnalysisHelper {
 
     val countsOfPointsWithNeighbors = closePoints
       .map(x => (x._1.pointId, x._2))
-      .foldByKey(1L)( _+_ ) // +1 to include the point itself
+      .foldByKey(1L)(_ + _) // +1 to include the point itself
       .cache()
 
     val indexedPoints = PointsPartitionedByBoxesRDD.extractPointIdsAndCoordinates (data)
@@ -106,10 +104,10 @@ object ExploratoryAnalysisHelper {
     //
     ////////////////////////////////////////////////////////////////////////////////////
 
-    // Compute the minimum and the maxium
+    // Compute the minimum and the maximum
     val (max: Double, min: Double) = data.mapPartitions { items =>
       Iterator(items.foldRight(Double.NegativeInfinity,
-        Double.PositiveInfinity)((e: Double, x: Pair[Double, Double]) =>
+        Double.PositiveInfinity)((e: Double, x: (Double, Double)) =>
         (x._1.max(e), x._2.min(e))))
     }.reduce { (maxmin1, maxmin2) =>
       (maxmin1._1.max(maxmin2._1), maxmin1._2.min(maxmin2._2))
@@ -133,10 +131,10 @@ object ExploratoryAnalysisHelper {
 
       buckets = tempBuckets.toArray
     } else {
-      buckets = Array (min, min)
+      buckets = Array(min, min)
     }
 
-    (buckets, data.histogram(buckets, true))
+    (buckets, data.histogram(buckets, evenBuckets = true))
   }
 
   private [dbscan] def convertHistogramToTriples (
@@ -144,7 +142,7 @@ object ExploratoryAnalysisHelper {
 
     val bucketBoundaries = histogram._1
     val values = histogram._2
-    val result = new ArrayBuffer[(Double, Double, Long)] ()
+    val result = new ArrayBuffer[(Double, Double, Long)]()
 
     for (i <- 0 to bucketBoundaries.length-2) {
       val newTriple = (bucketBoundaries(i), bucketBoundaries(i+1), values(i))
@@ -154,8 +152,7 @@ object ExploratoryAnalysisHelper {
     result
   }
 
-
-  private def keepOnlyValues (pointIndexesWithValues: RDD[(Long, Double)]) = {
-    pointIndexesWithValues.map ( _._2 ).cache()
+  private def keepOnlyValues (pointIndexesWithValues: RDD[(Long, Double)]): RDD[Double] = {
+    pointIndexesWithValues.map(_._2 ).cache()
   }
 }

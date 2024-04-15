@@ -17,7 +17,7 @@ import org.alitouka.spark.dbscan.spatial.rdd.PartitioningSettings
   */
 abstract class Dbscan protected (
   protected val settings: DbscanSettings,
-  protected val partitioningSettings: PartitioningSettings = new PartitioningSettings ())
+  protected val partitioningSettings: PartitioningSettings = new PartitioningSettings())
   extends Serializable
   with Logging {
 
@@ -39,7 +39,7 @@ object Dbscan {
     * @return A new object which implements the DBSCAN algorithm
     */
   protected def apply (settings: DbscanSettings,
-    partitioningSettings: PartitioningSettings = new PartitioningSettings ()): Dbscan = {
+    partitioningSettings: PartitioningSettings = new PartitioningSettings()): Dbscan = {
 
     new DistributedDbscan(settings, partitioningSettings)
   }
@@ -52,14 +52,14 @@ object Dbscan {
     * @return A [[org.alitouka.spark.dbscan.DbscanModel]] populated with information about clusters
     */
   def train (data: RawDataSet, settings: DbscanSettings,
-    partitioningSettings: PartitioningSettings = new PartitioningSettings ()): DbscanModel = {
+    partitioningSettings: PartitioningSettings = new PartitioningSettings()): DbscanModel = {
     Dbscan (settings, partitioningSettings).run (data)
   }
 
-  private [dbscan] def keepOnlyPairsWithKeys [K, V] (pairs: RDD[(K, V)], keysToLeave: RDD[K])
+  private [dbscan] def keepOnlyPairsWithKeys [K, V](pairs: RDD[(K, V)], keysToLeave: RDD[K])
     (implicit arg0: ClassTag[K], arg1: ClassTag[V]) = {
 
-    keysToLeave.map ( (_, null) ).join (pairs).map ( x => (x._1, x._2._2) )
+    keysToLeave.map((_, null)).join (pairs).map(x => (x._1, x._2._2))
   }
 
 

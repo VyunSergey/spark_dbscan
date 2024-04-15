@@ -10,7 +10,7 @@ import org.alitouka.spark.dbscan.spatial.rdd.PointsPartitionedByBoxesRDD
   * This object is returned from [[org.alitouka.spark.dbscan.Dbscan.run]] method.
   * You cannot instantiate it directly
   */
-class DbscanModel private[dbscan] (val allPoints: RDD[Point],
+class DbscanModel private[dbscan](val allPoints: RDD[Point],
 val settings: DbscanSettings)
   extends Serializable {
 
@@ -28,7 +28,7 @@ val settings: DbscanSettings)
   def predict (newPoint: Point): ClusterId = {
     val distanceAnalyzer = new DistanceAnalyzer(settings)
     val neighborCountsByCluster = distanceAnalyzer.findNeighborsOfNewPoint(allPoints, newPoint.coordinates)
-      .map ( x => (x.clusterId, x) )
+      .map(x => (x.clusterId, x))
       .countByKey()
 
     val neighborCountsWithoutNoise = neighborCountsByCluster.filter(_._1 != DbscanModel.NoisePoint)
@@ -81,7 +81,7 @@ val settings: DbscanSettings)
     *
     * @return
     */
-  def clusteredPoints: RDD[Point] = { allPoints.filter( _.clusterId != DbscanModel.NoisePoint) }
+  def clusteredPoints: RDD[Point] = { allPoints.filter(_.clusterId != DbscanModel.NoisePoint) }
 }
 
 /** Contains constants which designate cluster ID

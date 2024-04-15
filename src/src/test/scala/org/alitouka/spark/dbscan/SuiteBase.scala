@@ -1,47 +1,40 @@
 package org.alitouka.spark.dbscan
 
-import org.scalatest.{FunSuite, BeforeAndAfterEach, Matchers, FlatSpec}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.apache.spark.SparkContext
 import org.apache.spark.internal.Logging
-import org.alitouka.spark.dbscan.spatial.{PointSortKey, Point}
+import org.alitouka.spark.dbscan.spatial.{Point, PointSortKey}
+import org.apache.spark.rdd.RDD
 
-class SuiteBase extends FunSuite with Matchers with BeforeAndAfterEach with Logging {
+class SuiteBase extends AnyFunSuite with Matchers with BeforeAndAfterEach with Logging {
+  val sc: SparkContext = TestContextHolder.sc
 
-  val sc = TestContextHolder.sc
+  protected def readDataset(path: String): RDD[Point] = {
+    val rawData = sc.textFile(path)
 
-    protected def readDataset (path: String) = {
-
-      val rawData = sc.textFile (path)
-
-      rawData.map (
-        line => {
-          val split = line.split(",")
-          new Point (Array (split(0).toDouble, split(1).toDouble))
-        }
-      )
-
+    rawData.map { line =>
+      new Point(line.split(",").take(2).map(_.toDouble))
     }
+  }
 
-  def createRDDOfPoints (sc: SparkContext,
-                         points: (Double, Double)*) = {
-
-    val pointIds = 1 to points.size
-
-    val pointObjects = points
-      .zip (pointIds)
-      .map ( x => create2DPoint(x._1._1, x._1._2).withPointId(x._2) )
+  def createRDDOfPoints(sc: SparkContext, points: (Double, Double)*): RDD[Point] = {
+    val pointIds = points.indices.map(_ + 1)
+    val pointObjects = points.zip(pointIds).map { case ((x, y), id) =>
+      create2DPoint(x, y, id)
+    }
 
     sc.parallelize(pointObjects)
   }
 
-  def create2DPoint (x: Double, y: Double, idx: PointId = 0): Point = {
-    new Point ( new PointCoordinates (Array (x, y)), idx, 1, Math.sqrt (x*x+y*y))
+  def create2DPoint(x: Double, y: Double, idx: PointId = 0): Point = {
+    new Point(new PointCoordinates(Array(x, y)), idx, 1, Math.sqrt(x*x+y*y))
   }
 
-  def create2DPointWithSortKey (x: Double, y: Double, idx: PointId = 0): (PointSortKey, Point) = {
-
-    val pt = create2DPoint (x, y, idx)
-    val sortKey = new PointSortKey (pt)
+  def create2DPointWithSortKey(x: Double, y: Double, idx: PointId = 0): (PointSortKey, Point) = {
+    val pt = create2DPoint(x, y, idx)
+    val sortKey = new PointSortKey(pt)
 
     (sortKey, pt)
   }

@@ -63,7 +63,7 @@ class DbscanSettings extends Serializable {
     * @param eps
     * @return
     */
-  def withEpsilon (eps: Double) = {
+  def withEpsilon(eps: Double) = {
     _epsilon = eps
     this
   }
@@ -74,7 +74,7 @@ class DbscanSettings extends Serializable {
     * @param np
     * @return
     */
-  def withNumberOfPoints (np: Int) = {
+  def withNumberOfPoints(np: Int) = {
     _numPoints = np
     this
   }
@@ -84,7 +84,7 @@ class DbscanSettings extends Serializable {
   *
   */
 object DbscanSettings {
-  def getDefaultDistanceMeasure: DistanceMeasure = { new EuclideanDistance () }
+  def getDefaultDistanceMeasure: DistanceMeasure = { new EuclideanDistance() }
 
   def getDefaultTreatmentOfBorderPoints: Boolean = { false }
 

@@ -32,17 +32,17 @@ private [dbscan] class PartitionIndex (val partitionBounds: Box,
     * @param points
     * @tparam T
     */
-  def populate [T <: Iterable[Point]] (points: T): Unit = {
-    populate (points.iterator)
+  def populate [T <: Iterable[Point]](points: T): Unit = {
+    populate(points.iterator)
   }
 
-  def populate (points: Array[Point]): Unit = {
-    populate (points.iterator)
+  def populate(points: Array[Point]): Unit = {
+    populate(points.iterator)
   }
 
 
-  def populate (points: Iterator[Point]): Unit = {
-    val clock = new Clock ()
+  def populate(points: Iterator[Point]): Unit = {
+    val clock = new Clock()
 
     points.foreach {
       pt => {
@@ -66,7 +66,7 @@ private [dbscan] class PartitionIndex (val partitionBounds: Box,
 
   private [dbscan] def findPotentiallyClosePoints (pt: Point): Iterable[Point] = {
     val box1 = findBoxForPoint(pt, boxesTree)
-    var result = ListBuffer[Point] ()
+    var result = ListBuffer[Point]()
 
     result ++= box1.points.filter ( p => p.pointId != pt.pointId && Math.abs(p.distanceFromOrigin - pt.distanceFromOrigin) <= dbscanSettings.epsilon )
 
@@ -74,7 +74,7 @@ private [dbscan] class PartitionIndex (val partitionBounds: Box,
 
       box1.adjacentBoxes.foreach {
         box2 => {
-          val tempBox = Box (pt, largeBox)
+          val tempBox = Box(pt, largeBox)
 
           if (tempBox.isPointWithin(box2.box.centerPoint)) {
             result ++= box2.points.filter ( p => Math.abs(p.distanceFromOrigin - pt.distanceFromOrigin) <= dbscanSettings.epsilon )
@@ -87,21 +87,21 @@ private [dbscan] class PartitionIndex (val partitionBounds: Box,
   }
 
 
-  private def findBoxAndAddPoint (pt: Point, root: BoxTreeItemWithPoints): Unit = {
+  private def findBoxAndAddPoint(pt: Point, root: BoxTreeItemWithPoints): Unit = {
     val b = findBoxForPoint(pt, root)
     b.points += pt
   }
 
 
-  private [dbscan] def findBoxForPoint (pt: Point, root: BoxTreeItemWithPoints): BoxTreeItemWithPoints = {
+  private [dbscan] def findBoxForPoint(pt: Point, root: BoxTreeItemWithPoints): BoxTreeItemWithPoints = {
     if (root.children.isEmpty) {
       root
     }
     else {
-     val child = root.children.find ( x => x.box.isPointWithin(pt) )
+     val child = root.children.find( x => x.box.isPointWithin(pt))
 
       child match {
-        case b: Some[BoxTreeItemWithPoints] => findBoxForPoint (pt, b.get)
+        case b: Some[BoxTreeItemWithPoints] => findBoxForPoint(pt, b.get)
         case _ => {
           throw new Exception (s"Box for point $pt was not found")
         }
@@ -127,7 +127,7 @@ private [dbscan] object PartitionIndex extends DistanceCalculation {
 
   def buildTree (boundingBox: Box, sortedBoxes: Array[Box]): BoxTreeItemWithPoints = {
 
-    val leafs = sortedBoxes.map (b =>  new BoxTreeItemWithPoints (b))
+    val leafs = sortedBoxes.map(b =>  new BoxTreeItemWithPoints (b))
 
     leafs.foreach {
       leaf => leaf.adjacentBoxes ++= findAdjacentBoxes(leaf, leafs)
@@ -153,7 +153,7 @@ private [dbscan] object PartitionIndex extends DistanceCalculation {
       while (nodeStart <= end) {
 
         val b = leafs(nodeStart).box.bounds(dimension)
-        val leafsSubset =  ArrayBuffer[BoxTreeItemWithPoints] ()
+        val leafsSubset =  ArrayBuffer[BoxTreeItemWithPoints]()
 
         while (nodeEnd <= end && leafs(nodeEnd).box.bounds(dimension) == b) {
           leafsSubset += leafs(nodeEnd)
@@ -180,17 +180,17 @@ private [dbscan] object PartitionIndex extends DistanceCalculation {
   }
 
 
-  def generateEmbracingBox (subitems: Iterable[BoxTreeItemWithPoints], numberOfDimensions: Int): Box = {
+  def generateEmbracingBox(subitems: Iterable[BoxTreeItemWithPoints], numberOfDimensions: Int): Box = {
 
-    var dimensions: ArrayBuffer[BoundsInOneDimension] = ArrayBuffer[BoundsInOneDimension] ()
+    var dimensions: ArrayBuffer[BoundsInOneDimension] = ArrayBuffer[BoundsInOneDimension]()
 
     (0 until numberOfDimensions).foreach {
       i => {
         val zeroValue = new BoundsInOneDimension(Double.MaxValue, Double.MinValue, false)
-        val x = subitems.map ( _.box.bounds(i) )
+        val x = subitems.map(_.box.bounds(i))
         val newDimension = x.fold(zeroValue) {
           (a,b) =>
-            new BoundsInOneDimension (
+            new BoundsInOneDimension(
               Math.min (a.lower, b.lower),
               Math.max (a.upper, b.upper),
               a.includeHigherBound || b.includeHigherBound
@@ -201,11 +201,11 @@ private [dbscan] object PartitionIndex extends DistanceCalculation {
       }
     }
 
-    new Box (dimensions.toArray)
+    new Box(dimensions.toArray)
   }
 
 
-  def generateAndSortBoxes (boundingBox: Box, maxNumberOfSplits: Int, dbscanSettings: DbscanSettings): Array [Box] = {
+  def generateAndSortBoxes (boundingBox: Box, maxNumberOfSplits: Int, dbscanSettings: DbscanSettings): Array[Box] = {
     BoxCalculator
       .splitBoxIntoEqualBoxes(boundingBox, maxNumberOfSplits, dbscanSettings)
       .toArray
@@ -252,7 +252,7 @@ private [dbscan] object PartitionIndex extends DistanceCalculation {
   }
 
 
-  def findFirstLeafBox (root: BoxTreeItemWithPoints): Box = {
+  def findFirstLeafBox(root: BoxTreeItemWithPoints): Box = {
     var result = root
 
     while (!result.children.isEmpty) {

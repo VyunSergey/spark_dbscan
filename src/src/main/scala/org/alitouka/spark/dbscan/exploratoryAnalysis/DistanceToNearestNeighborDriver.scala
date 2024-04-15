@@ -5,7 +5,7 @@ import org.apache.spark.SparkContext
 import org.alitouka.spark.dbscan.util.io.IOHelper
 import org.alitouka.spark.dbscan.DbscanSettings
 import org.alitouka.spark.dbscan.spatial.rdd.{PointsPartitionedByBoxesRDD, PartitioningSettings}
-import org.alitouka.spark.dbscan.spatial.{DistanceCalculation, Point, PointSortKey, DistanceAnalyzer}
+import org.alitouka.spark.dbscan.spatial.{DistanceCalculation, Point, PointSortKey}
 import org.apache.commons.math3.ml.distance.DistanceMeasure
 import org.alitouka.spark.dbscan.util.debug.Clock
 import org.alitouka.spark.dbscan.RawDataSet
@@ -18,14 +18,14 @@ object DistanceToNearestNeighborDriver extends DistanceCalculation {
   private [dbscan] class Args extends CommonArgs with NumberOfBucketsArg with NumberOfPointsInPartitionArg
 
   private [dbscan] class ArgsParser
-    extends CommonArgsParser (new Args (), "DistancesToNearestNeighborDriver")
+    extends CommonArgsParser(new Args(), "DistancesToNearestNeighborDriver")
     with NumberOfBucketsArgParsing [Args]
     with NumberOfPointsInPartitionParsing [Args]
 
-  def main (args: Array[String]) {
+  def main (args: Array[String]): Unit = {
     val argsParser = new ArgsParser()
 
-    if (argsParser.parse(args)) {
+    if (argsParser.parse(args, new Args()).nonEmpty) {
       val clock = new Clock()
 
       val sc = new SparkContext(argsParser.args.masterUrl,
@@ -52,7 +52,7 @@ object DistanceToNearestNeighborDriver extends DistanceCalculation {
   def createNearestNeighborHistogram(
     data: RawDataSet,
     settings: DbscanSettings = new DbscanSettings(),
-    partitioningSettings: PartitioningSettings = new PartitioningSettings()) = {
+    partitioningSettings: PartitioningSettings = new PartitioningSettings()): (Array[Double], Array[Long]) = {
     
     val partitionedData = PointsPartitionedByBoxesRDD(data, partitioningSettings)
     
@@ -71,9 +71,9 @@ object DistanceToNearestNeighborDriver extends DistanceCalculation {
     distanceMeasure: DistanceMeasure) = {
 
     val sortedPoints = it
-      .map ( x => new PointWithDistanceToNearestNeighbor(x._2) )
+      .map(x => new PointWithDistanceToNearestNeighbor(x._2))
       .toArray
-      .sortBy( _.distanceFromOrigin )
+      .sortBy(_.distanceFromOrigin )
 
     var previousPoints: List[PointWithDistanceToNearestNeighbor] = Nil
 
@@ -99,6 +99,6 @@ object DistanceToNearestNeighborDriver extends DistanceCalculation {
       }
     }
 
-    sortedPoints.filter( _.distanceToNearestNeighbor < Double.MaxValue).map ( x => (x.pointId, x.distanceToNearestNeighbor)).iterator
+    sortedPoints.filter(_.distanceToNearestNeighbor < Double.MaxValue).map(x => (x.pointId, x.distanceToNearestNeighbor)).iterator
   }
 }

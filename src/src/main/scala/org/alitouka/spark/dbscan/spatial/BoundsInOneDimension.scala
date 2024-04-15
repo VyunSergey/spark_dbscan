@@ -9,7 +9,7 @@ import org.alitouka.spark.dbscan.util.math.DoubleComparisonOperations._
   * @param upper An upper bound
   * @param includeHigherBound Indicates whether the upper bound should be included
   */
-private [dbscan] class BoundsInOneDimension (val lower: Double, val upper: Double,
+private [dbscan] class BoundsInOneDimension(val lower: Double, val upper: Double,
   val includeHigherBound: Boolean = false)
   extends Serializable {
 
@@ -72,7 +72,7 @@ private [dbscan] class BoundsInOneDimension (val lower: Double, val upper: Doubl
   def extend (byLength: Double): BoundsInOneDimension = {
     val halfLength = byLength / 2
 
-    new BoundsInOneDimension (this.lower - halfLength, this.upper + halfLength, this.includeHigherBound)
+    new BoundsInOneDimension(this.lower - halfLength, this.upper + halfLength, this.includeHigherBound)
   }
 
   def extend (by: BoundsInOneDimension): BoundsInOneDimension = {
@@ -80,7 +80,7 @@ private [dbscan] class BoundsInOneDimension (val lower: Double, val upper: Doubl
   }
 
   def increaseToFit (that: BoundsInOneDimension): BoundsInOneDimension = {
-    new BoundsInOneDimension (Math.min (this.lower, that.lower), Math.max (this.upper, that.upper),
+    new BoundsInOneDimension(Math.min (this.lower, that.lower), Math.max (this.upper, that.upper),
       this.includeHigherBound || that.includeHigherBound)
   }
 
@@ -111,7 +111,7 @@ private [dbscan] class BoundsInOneDimension (val lower: Double, val upper: Doubl
 
 private [dbscan] object BoundsInOneDimension {
   implicit def tupleOfDoublesToBounds (x: (Double, Double)): BoundsInOneDimension = {
-    new BoundsInOneDimension (x._1, x._2)
+    new BoundsInOneDimension(x._1, x._2)
   }
 
   implicit def tupleOfDoublesAndBoolToBounds (x: (Double, Double, Boolean)): BoundsInOneDimension = {

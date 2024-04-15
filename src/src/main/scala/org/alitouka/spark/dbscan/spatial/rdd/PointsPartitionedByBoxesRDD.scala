@@ -13,13 +13,13 @@ import org.alitouka.spark.dbscan.util.PointIndexer
   * @param boundingBox
   */
 private [dbscan] class PointsPartitionedByBoxesRDD  (prev: RDD[(PointSortKey, Point)], val boxes: Iterable[Box], val boundingBox: Box)
-  extends ShuffledRDD [PointSortKey, Point, Point] (prev, new BoxPartitioner(boxes))
+  extends ShuffledRDD [PointSortKey, Point, Point](prev, new BoxPartitioner(boxes))
 
 object PointsPartitionedByBoxesRDD {
 
   def apply (rawData: RawDataSet,
-    partitioningSettings: PartitioningSettings = new PartitioningSettings (),
-    dbscanSettings: DbscanSettings = new DbscanSettings ())
+    partitioningSettings: PartitioningSettings = new PartitioningSettings(),
+    dbscanSettings: DbscanSettings = new DbscanSettings())
     : PointsPartitionedByBoxesRDD = {
 
     val sc = rawData.sparkContext
@@ -34,7 +34,7 @@ object PointsPartitionedByBoxesRDD {
       broadcastNumberOfDimensions,
       dbscanSettings.distanceMeasure)
 
-    PointsPartitionedByBoxesRDD (pointsInBoxes, boxes, boundingBox)
+    PointsPartitionedByBoxesRDD(pointsInBoxes, boxes, boundingBox)
   }
 
   def apply (pointsInBoxes: RDD[(PointSortKey, Point)], boxes: Iterable[Box], boundingBox: Box): PointsPartitionedByBoxesRDD = {
@@ -43,7 +43,7 @@ object PointsPartitionedByBoxesRDD {
 
 
   private [dbscan] def extractPointIdsAndCoordinates (data: RDD[(PointSortKey, Point)]): RDD[(PointId, PointCoordinates)] = {
-    data.map ( x => (x._2.pointId, x._2.coordinates) )
+    data.map(x => (x._2.pointId, x._2.coordinates))
   }
 
 }

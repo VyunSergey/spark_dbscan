@@ -1,7 +1,7 @@
 package org.alitouka.spark.dbscan.util.commandLine
 
-private [dbscan] trait EpsArgParsing [C <: CommonArgs with EpsArg] extends CommonArgsParser[C] {
-  opt[Double] ('e', "eps")
+private [dbscan] trait EpsArgParsing[C <: CommonArgs with EpsArg] extends CommonArgsParser[C] {
+  opt[Double]('e', "eps")
     .required()
     .foreach { args.eps = _ }
     .valueName("<eps>")

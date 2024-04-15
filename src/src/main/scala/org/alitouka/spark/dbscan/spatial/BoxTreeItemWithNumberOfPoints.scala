@@ -2,7 +2,7 @@ package org.alitouka.spark.dbscan.spatial
 
 import scala.collection.mutable.ArrayBuffer
 
-private [dbscan] class BoxTreeItemWithNumberOfPoints (b: Box) extends BoxTreeItemBase [BoxTreeItemWithNumberOfPoints] (b) {
+private [dbscan] class BoxTreeItemWithNumberOfPoints (b: Box) extends BoxTreeItemBase [BoxTreeItemWithNumberOfPoints](b) {
 
   var numberOfPoints: Long = 0
 
