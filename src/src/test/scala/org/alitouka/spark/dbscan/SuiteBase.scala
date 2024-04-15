@@ -10,6 +10,7 @@ import org.apache.spark.rdd.RDD
 
 class SuiteBase extends AnyFunSuite with Matchers with BeforeAndAfterEach with Logging {
   val sc: SparkContext = TestContextHolder.sc
+  sc.setLogLevel("WARN")
 
   protected def readDataset(path: String): RDD[Point] = {
     val rawData = sc.textFile(path)

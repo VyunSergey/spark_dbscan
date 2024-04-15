@@ -127,7 +127,7 @@ class PartitionIndexSuite extends SuiteBase with TestDatasets with DistanceCalcu
   private def testPoint(pt: Point, allPoints: Iterable[Point], partitionIndex: PartitionIndex, dbscanSettings: DbscanSettings): Unit = {
     implicit val distanceMeasure: DistanceMeasure = dbscanSettings.distanceMeasure
 
-    val expectedClosePoints = allPoints.filter ( p => p != pt && calculateDistance (p, pt) <= dbscanSettings.epsilon ).toSet
+    val expectedClosePoints = allPoints.filter( p => p != pt && calculateDistance (p, pt) <= dbscanSettings.epsilon ).toSet
     val foundClosePoints = partitionIndex.findClosePoints(pt).toSet
 
     expectedClosePoints should equal (foundClosePoints)

@@ -60,7 +60,7 @@ private [dbscan] class PartitionIndex (val partitionBounds: Box,
     * @return A collection of pt's neighbors
     */
   def findClosePoints (pt: Point): Iterable[Point] = {
-    findPotentiallyClosePoints(pt).filter ( p => p.pointId != pt.pointId && calculateDistance (p, pt) <= dbscanSettings.epsilon )
+    findPotentiallyClosePoints(pt).filter( p => p.pointId != pt.pointId && calculateDistance (p, pt) <= dbscanSettings.epsilon )
   }
 
 
@@ -68,7 +68,7 @@ private [dbscan] class PartitionIndex (val partitionBounds: Box,
     val box1 = findBoxForPoint(pt, boxesTree)
     var result = ListBuffer[Point]()
 
-    result ++= box1.points.filter ( p => p.pointId != pt.pointId && Math.abs(p.distanceFromOrigin - pt.distanceFromOrigin) <= dbscanSettings.epsilon )
+    result ++= box1.points.filter( p => p.pointId != pt.pointId && Math.abs(p.distanceFromOrigin - pt.distanceFromOrigin) <= dbscanSettings.epsilon )
 
     if (this.isPointCloseToAnyBound(pt, box1.box, dbscanSettings.epsilon)) {
 
@@ -77,7 +77,7 @@ private [dbscan] class PartitionIndex (val partitionBounds: Box,
           val tempBox = Box(pt, largeBox)
 
           if (tempBox.isPointWithin(box2.box.centerPoint)) {
-            result ++= box2.points.filter ( p => Math.abs(p.distanceFromOrigin - pt.distanceFromOrigin) <= dbscanSettings.epsilon )
+            result ++= box2.points.filter( p => Math.abs(p.distanceFromOrigin - pt.distanceFromOrigin) <= dbscanSettings.epsilon )
           }
         }
       }
@@ -218,7 +218,7 @@ private [dbscan] object PartitionIndex extends DistanceCalculation {
 
     var result: List[BoxTreeItemWithPoints] = Nil
 
-    boxes.filter ( _ != x).foreach {
+    boxes.filter( _ != x).foreach {
       y => {
 
         // The code below relies on the fact that all boxes are of equal size

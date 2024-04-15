@@ -40,7 +40,7 @@ object IOHelper {
     model.allPoints.map(pt => {
 
       pt.coordinates.mkString(separator) + separator + pt.clusterId
-    } ).saveAsTextFile(outputPath)
+    }).saveAsTextFile(outputPath)
   }
 
   private [dbscan] def saveTriples (data: RDD[(Double, Double, Long)], outputPath: String) {

@@ -138,7 +138,7 @@ private [dbscan] class DistanceAnalyzer(
 
       val box = broadcastBoxes.value.find(_.partitionId == index).get
 
-      it.filter ( x => isPointCloseToAnyBound (x._2, box, eps)).map(_._2 )
+      it.filter( x => isPointCloseToAnyBound (x._2, box, eps)).map(_._2 )
     })
   }
 

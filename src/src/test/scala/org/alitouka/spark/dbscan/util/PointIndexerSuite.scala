@@ -39,7 +39,8 @@ class PointIndexerSuite extends SuiteBase {
     }
 
     val filteredPoints: Array[((Long, String), (Long, String))] = indexedPoints.cartesian(indexedPoints)
-      .filter (x => { x._1._1 < x._2._1 } ).collect()
+      .filter(x => x._1._1 < x._2._1)
+      .collect()
 
     val numFilteredPoints: Int = filteredPoints.length
 
